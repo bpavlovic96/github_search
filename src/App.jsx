@@ -10,22 +10,20 @@ function App() {
   const [repos, setRepos] = useState([]);
 
   useEffect(() => {
-    const handleSearch = () => {
-      fetch(`https://api.github.com/users/${username}`)
-        .then((res) => res.json())
-        .then((data) => setUser(data));
-    };
-    if (username) handleSearch();
+    if (username) {
+      Promise.all([
+        fetch(`https://api.github.com/users/${username}`).then((res) =>
+          res.json()
+        ),
+        fetch(`https://api.github.com/users/${username}/repos`).then((res) =>
+          res.json()
+        ),
+      ]).then((data) => {
+        setUser(data[0]);
+        setRepos(data[1]);
+      });
+    }
   }, [username]);
-
-  useEffect(() => {
-    const handleSearch = () => {
-      fetch(`https://api.github.com/users/${username}/repos`)
-        .then((res) => res.json())
-        .then((data) => setRepos(data));
-    };
-    if (username && user) handleSearch();
-  }, [user, username]);
 
   const handleOnClick = () => {
     setUser();
